@@ -3,7 +3,9 @@ import {Router} from 'express' ;
 import {
   registerUser ,
   loginUser ,
-  getUserDetails
+  getUserDetails ,
+  resetPassword ,
+  forgetPassword 
 } from "../controllers/user.controllers.js" ;
 
 import { verifyJwt } from "../middlewares/auth.middlewares.js" ;
@@ -18,5 +20,12 @@ userRouter.route("/login").post(loginUser) ;
 
 //get current user details
 userRouter.route("/me").get(verifyJwt , getUserDetails) ;
+
+// reset password
+userRouter.route("/reset-password").post(verifyJwt ,resetPassword) ;
+
+// forget password
+userRouter.route("/forget-password").post(forgetPassword) ;
+
 
 export default Router;

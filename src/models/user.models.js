@@ -21,7 +21,9 @@ const userSchema = new mongoose.Schema({
   },
   Password : {
     type : String ,
+    unique : true ,
     required : [true , 'password is required'],
+    
   }
 }, {timestamps : true})
 
@@ -41,8 +43,6 @@ userSchema.methods.isPasswordCorrect = async function (Password){
 }
 
 //token generation
-import jwt from "jsonwebtoken" ;
-
 userSchema.methods.generateAccessTokens = function(){
   return jwt.sign(
     {

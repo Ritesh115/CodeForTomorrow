@@ -1,6 +1,6 @@
 import {User} from "../models/user.models.js" ;
 import { asyncHandler } from "../utils/asyncHandler.js"
-
+import { sendResetEmail } from "../utils/resetPassword.js";
 
 const registerUser = asyncHandler( (req ,res)=> {
     //1
@@ -137,14 +137,63 @@ const getUserDetails = asyncHandler( (req ,res)=>{
      )
 });
 
-const forgetPassword = asyncHandler ( (req ,res)=>{
+const resetPassword = asyncHandler( async (req , res)=>{
+  //1 get password from client side 
+  const {newPassword , oldPassword} = req.body ;
+  //2 check if oldpassword is true or not
+  const validatePassword = User.isPasswordCorrect(oldPassword);
+  if(!validatePassword){
+    return res.statu(400).json({
+      status : false ,
+      message : "Old password is incorrect"
+    })
+  }
+  //3 update old with new password 
+  const user = await User.findById(user?._id) ;
+  user.Password = newPassword ;
+  await user.save();
+  //4 send response
+  return res.statu(200).json({
+    status : true ,
+    message : "Password changed successfully"
+  })
+  
+} );
 
+
+const forgetPassword = asyncHandler ( async (req ,res)=>{
+   //1 get email from client side
+   const {Email} = req.body ;
+
+   //2 check for validation of user
+    const user =  await User.findOne({
+      Email ,
+    })
+    if(!user){
+      return res.status(404).json({
+        status : false ,
+        message : "User not found"
+      })
+    }
+
+    //3 send reset email
+    await sendResetEmail(user) ;
+
+    //4 send response 
+    return res.statu(200).json({
+      status : true ,
+      message : "Password reset email sent successfully"
+    })
 })
+
+
 
 export {
   registerUser ,
   loginUser ,
-  getUserDetails
+  getUserDetails ,
+  resetPassword ,
+  forgetPassword 
 };
 
 
