@@ -16,15 +16,17 @@ const sendResetEmail = async (user)=>{
      );
 
      //2 hashing the token before saving to Db for security
-     const hashedToken = crypto.hash('sha256').update(tempToken).digest('hex') ;
+     const hashedToken =  crypto.createHash('sha256').update(tempToken).digest('hex') ;
 
      //3 store in Db .
      user.tempToken = hashedToken ;
      user.tempTokenExpiry = Date.now() + 15 * 60 * 1000; // 15 min expiry
-     await user.save() ;
+     await user.save({
+          validationBeforeSave : false ,
+     }) ;
 
      //4 create reset link
-     const resetLink = `https://localhost:5000/reset-password?token=${tempToken}` ;
+     const resetLink = `http://localhost:5000/reset-password?token=${tempToken}` ;
 
      //5 send email to user with nodemailer
       //Create a transporter.
@@ -34,15 +36,15 @@ const sendResetEmail = async (user)=>{
      const transporter = nodemailer.createTransport({
           service: "gmail", 
           auth: {
-               user: "process.env.EMAIL_USER",
-               pass: "process.env.EMAIL_PASS", // Use App Password if using Gmail + 2FA
+               user: process.env.EMAIL_USER,
+               pass: process.env.EMAIL_PASS, // Use App Password if using Gmail + 2FA
           },
      })
 
      const mailOptions = {
-          from : "process.env.EMAIL_USER" ,
-          to : "user.Email"  ,
-          subject :"Password reset request" ,
+          from: process.env.EMAIL_USER,
+          to: user.Email,
+          subject: "Password reset request",
           html: `
              <p>Hello,</p>
              <p>You requested a password reset. Click the link below to reset your password:</p>

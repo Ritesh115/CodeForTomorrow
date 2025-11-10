@@ -4,8 +4,9 @@ import {
   registerUser ,
   loginUser ,
   getUserDetails ,
-  resetPassword ,
-  forgetPassword 
+  changePassword,
+  forgetPassword ,
+  resetPassword
 } from "../controllers/user.controllers.js" ;
 
 import { verifyJwt } from "../middlewares/auth.middlewares.js" ;
@@ -19,13 +20,15 @@ userRouter.route("/register").post(registerUser) ;
 userRouter.route("/login").post(loginUser) ;
 
 //get current user details
-userRouter.route("/me").get(verifyJwt , getUserDetails) ;
+userRouter.route("/get").get(verifyJwt , getUserDetails) ;
 
 // reset password
-userRouter.route("/reset-password").post(verifyJwt ,resetPassword) ;
+userRouter.route("/reset-password").post(verifyJwt , changePassword) ;
 
 // forget password
-userRouter.route("/forget-password").post(forgetPassword) ;
+userRouter.route("/forget-password").post(verifyJwt , forgetPassword) ;
 
+// resetPassword
+userRouter.route("/reset-password").post(resetPassword) ;
 
-export default Router;
+export default userRouter;
